@@ -1,8 +1,7 @@
-import 'dart:async';
-
 import 'package:action_broadcast/action_broadcast.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:facebook_audience_network/facebook_audience_network.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -28,22 +27,16 @@ class CalculatorScreen extends StatefulWidget {
 
 class _CalculatorScreenState extends State<CalculatorScreen> {
   String screenName = "CalculatorScreen";
-  bool isFacebookAdsShow =
-      StorageUtils.prefs.getBool(StorageKeyUtils.isShowFacebookAds) ?? false;
-  bool isADXAdsShow =
-      StorageUtils.prefs.getBool(StorageKeyUtils.isShowADXAds) ?? false;
-  bool isAdmobAdsShow =
-      StorageUtils.prefs.getBool(StorageKeyUtils.isShowAdmobAds) ?? false;
-  bool isAdShow =
-      StorageUtils.prefs.getBool(StorageKeyUtils.isAddShowInApp) ?? false;
+  bool isFacebookAdsShow = StorageUtils.prefs.getBool(StorageKeyUtils.isShowFacebookAds) ?? false;
+  bool isADXAdsShow = StorageUtils.prefs.getBool(StorageKeyUtils.isShowADXAds) ?? false;
+  bool isAdmobAdsShow = StorageUtils.prefs.getBool(StorageKeyUtils.isShowAdmobAds) ?? false;
+  bool isAdShow = StorageUtils.prefs.getBool(StorageKeyUtils.isAddShowInApp) ?? false;
   // List<String> availableAdsList = [];
 
   MyAdsIdClass myAdsIdClass = MyAdsIdClass();
   late StreamSubscription receiver;
 
-  bool isCheckScreen =
-      StorageUtils.prefs.getBool(StorageKeyUtils.isCheckScreenForAdInApp) ??
-          false;
+  bool isCheckScreen = StorageUtils.prefs.getBool(StorageKeyUtils.isCheckScreenForAdInApp) ?? false;
 
   @override
   void initState() {
@@ -51,11 +44,13 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     initReceiver();
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      final provider =
-          Provider.of<InterstitialAdsWidgetProvider>(context, listen: false);
+      if (!kDebugMode) {
+        await FirebaseAnalytics.instance.logEvent(name: screenName);
+      }
 
-      myAdsIdClass = await LoadAdsByApi()
-          .isAvailableAds(context: context, screenName: screenName);
+      final provider = Provider.of<InterstitialAdsWidgetProvider>(context, listen: false);
+
+      myAdsIdClass = await LoadAdsByApi().isAvailableAds(context: context, screenName: screenName);
 
       if (myAdsIdClass.availableAdsList.contains("Native")) {
         if (isCheckScreen) {
@@ -71,28 +66,14 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       }
       if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
         if (isCheckScreen) {
-          provider.loadFBInterstitialAd(
-              myAdsIdClass: myAdsIdClass,
-              screenName: screenName,
-              fbID: myAdsIdClass.facebookInterstitialId,
-              googleID: myAdsIdClass.googleInterstitialId);
+          provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
         } else {
-          print(
-              "myAdsIdClass.isFacebook && isFacebookAdsShow interstitial screenName --> $screenName --> ${myAdsIdClass.isFacebook} $isFacebookAdsShow");
+          print("myAdsIdClass.isFacebook && isFacebookAdsShow interstitial screenName --> $screenName --> ${myAdsIdClass.isFacebook} $isFacebookAdsShow");
           if (myAdsIdClass.isFacebook && isFacebookAdsShow) {
-            provider.loadFBInterstitialAd(
-                myAdsIdClass: myAdsIdClass,
-                screenName: screenName,
-                fbID: myAdsIdClass.facebookInterstitialId,
-                googleID: myAdsIdClass.googleInterstitialId);
+            provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
           }
           if (myAdsIdClass.isGoogle && isADXAdsShow) {
-            provider.loadAdxInterstitialAd(
-                myAdsIdClass: myAdsIdClass,
-                screenName: screenName,
-                context: context,
-                fbInterID: myAdsIdClass.facebookInterstitialId,
-                googleInterID: myAdsIdClass.googleInterstitialId);
+            provider.loadAdxInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, context: context, fbInterID: myAdsIdClass.facebookInterstitialId, googleInterID: myAdsIdClass.googleInterstitialId);
           }
         }
       }
@@ -104,36 +85,20 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       print('$screenName Data ----> ${intent.extras}');
       switch (intent.action) {
         case 'LoadAd':
-          final provider = Provider.of<InterstitialAdsWidgetProvider>(context,
-              listen: false);
-          myAdsIdClass = await LoadAdsByApi()
-              .isAvailableAds(context: context, screenName: screenName);
+          final provider = Provider.of<InterstitialAdsWidgetProvider>(context, listen: false);
+          myAdsIdClass = await LoadAdsByApi().isAvailableAds(context: context, screenName: screenName);
           setState(() {});
 
           if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
             if (isCheckScreen) {
-              provider.loadFBInterstitialAd(
-                  myAdsIdClass: myAdsIdClass,
-                  screenName: screenName,
-                  fbID: myAdsIdClass.facebookInterstitialId,
-                  googleID: myAdsIdClass.googleInterstitialId);
+              provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
             } else {
-              print(
-                  "myAdsIdClass.isFacebook && isFacebookAdsShow in receiver interstitial screenName --> $screenName --> ${myAdsIdClass.isFacebook} $isFacebookAdsShow");
+              print("myAdsIdClass.isFacebook && isFacebookAdsShow in receiver interstitial screenName --> $screenName --> ${myAdsIdClass.isFacebook} $isFacebookAdsShow");
               if (myAdsIdClass.isFacebook && isFacebookAdsShow) {
-                provider.loadFBInterstitialAd(
-                    myAdsIdClass: myAdsIdClass,
-                    screenName: screenName,
-                    fbID: myAdsIdClass.facebookInterstitialId,
-                    googleID: myAdsIdClass.googleInterstitialId);
+                provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
               }
               if (myAdsIdClass.isGoogle && isADXAdsShow) {
-                provider.loadAdxInterstitialAd(
-                    myAdsIdClass: myAdsIdClass,
-                    screenName: screenName,
-                    context: context,
-                    fbInterID: myAdsIdClass.facebookInterstitialId,
-                    googleInterID: myAdsIdClass.googleInterstitialId);
+                provider.loadAdxInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, context: context, fbInterID: myAdsIdClass.facebookInterstitialId, googleInterID: myAdsIdClass.googleInterstitialId);
               }
             }
           }
@@ -146,16 +111,13 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   Widget fbNativeBannerAd = const SizedBox();
 
   _showFBNativeAd({required String isCalledFrom}) {
-    bool isFailedTwiceToLoadFbAdId = StorageUtils.prefs.getBool(
-            '${StorageKeyUtils.isFailedTwiceToLoadFbAdId}${myAdsIdClass.facebookNativeId}') ??
-        false;
+    bool isFailedTwiceToLoadFbAdId = StorageUtils.prefs.getBool('${StorageKeyUtils.isFailedTwiceToLoadFbAdId}${myAdsIdClass.facebookNativeId}') ?? false;
 
     if (myAdsIdClass.facebookNativeId.isEmpty || isFailedTwiceToLoadFbAdId) {
       loadAdxNativeAd(isCalledFrom: isCalledFrom);
     } else {
       setState(() {
-        fbNativeBannerAd = loadFbNativeAd(myAdsIdClass.facebookNativeId,
-            isCalledFrom: isCalledFrom);
+        fbNativeBannerAd = loadFbNativeAd(myAdsIdClass.facebookNativeId, isCalledFrom: isCalledFrom);
       });
       // updatePrefsResponse(adType: 'Native');
     }
@@ -170,15 +132,10 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
 
   updatePrefsResponse({required String adType}) {
     Timer(const Duration(seconds: 1), () {
-      isFacebookAdsShow =
-          StorageUtils.prefs.getBool(StorageKeyUtils.isShowFacebookAds) ??
-              false;
-      isADXAdsShow =
-          StorageUtils.prefs.getBool(StorageKeyUtils.isShowADXAds) ?? false;
-      isAdmobAdsShow =
-          StorageUtils.prefs.getBool(StorageKeyUtils.isShowAdmobAds) ?? false;
-      isAdShow =
-          StorageUtils.prefs.getBool(StorageKeyUtils.isAddShowInApp) ?? false;
+      isFacebookAdsShow = StorageUtils.prefs.getBool(StorageKeyUtils.isShowFacebookAds) ?? false;
+      isADXAdsShow = StorageUtils.prefs.getBool(StorageKeyUtils.isShowADXAds) ?? false;
+      isAdmobAdsShow = StorageUtils.prefs.getBool(StorageKeyUtils.isShowAdmobAds) ?? false;
+      isAdShow = StorageUtils.prefs.getBool(StorageKeyUtils.isAddShowInApp) ?? false;
       setState(() {});
       if (isAdmobAdsShow) {
         setState(() {
@@ -233,8 +190,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
 
   ///New Flow
   Widget loadFbNativeAd(String adId, {String isCalledFrom = 'init'}) {
-    print(
-        'Screen name loadFbNativeAd() ---> $screenName isCalledFrom -->$isCalledFrom ');
+    print('Screen name loadFbNativeAd() ---> $screenName isCalledFrom -->$isCalledFrom ');
 
     String nativeAdId = adId;
     // AdsUnitId().getFacebookNativeAdId();
@@ -267,13 +223,10 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           StorageUtils.prefs.setBool(StorageKeyUtils.isShowFacebookAds, false);
           StorageUtils.prefs.setBool(StorageKeyUtils.isShowADXAds, true);
           StorageUtils.prefs.setBool(StorageKeyUtils.isShowAdmobAds, true);
-          bool isFailedTwiceToLoadFbAdId = StorageUtils.prefs.getBool(
-                  '${StorageKeyUtils.isFailedTwiceToLoadFbAdId}$adId') ??
-              false;
+          bool isFailedTwiceToLoadFbAdId = StorageUtils.prefs.getBool('${StorageKeyUtils.isFailedTwiceToLoadFbAdId}$adId') ?? false;
 
           if (!isFailedTwiceToLoadFbAdId) {
-            StorageUtils.prefs.setBool(
-                '${StorageKeyUtils.isFailedTwiceToLoadFbAdId}$adId', true);
+            StorageUtils.prefs.setBool('${StorageKeyUtils.isFailedTwiceToLoadFbAdId}$adId', true);
             loadAdxNativeAd(isCalledFrom: 'fbNativeFunction');
           }
         }
@@ -289,19 +242,13 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       children: [
         SafeArea(
           child: Container(
-            decoration: BoxDecoration(
-                border: Border(
-                    bottom: BorderSide(
-                        color:
-                            ColorUtils.themeColor.oxff858494.withOpacity(0.2))),
-                color: Colors.transparent),
+            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: ColorUtils.themeColor.oxff858494.withOpacity(0.2))), color: Colors.transparent),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(LocaleKeys.Calculator.tr(),
-                      style: FontUtils.h20(fontWeight: FWT.bold)),
+                  Text(LocaleKeys.Calculator.tr(), style: FontUtils.h20(fontWeight: FWT.bold)),
                   const LottieAdWidget(lottieURL: AssetUtils.icCalculator),
                 ],
               ),
@@ -328,9 +275,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: BounceClickWidget(
                     onTap: () {
-                      final provider =
-                          Provider.of<InterstitialAdsWidgetProvider>(context,
-                              listen: false);
+                      final provider = Provider.of<InterstitialAdsWidgetProvider>(context, listen: false);
                       if (receiver != null) {
                         receiver.cancel();
                       }
@@ -350,12 +295,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                           height: screenSize.height * 0.30,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
-                            boxShadow: const [
-                              BoxShadow(
-                                  color: Colors.black,
-                                  blurRadius: 10,
-                                  spreadRadius: -7)
-                            ],
+                            boxShadow: const [BoxShadow(color: Colors.black, blurRadius: 10, spreadRadius: -7)],
                             color: ColorUtils.themeColor.oxffFFFFFF,
                           ),
                           child: ClipRRect(
@@ -389,9 +329,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: BounceClickWidget(
                     onTap: () {
-                      final provider =
-                          Provider.of<InterstitialAdsWidgetProvider>(context,
-                              listen: false);
+                      final provider = Provider.of<InterstitialAdsWidgetProvider>(context, listen: false);
                       if (receiver != null) {
                         receiver.cancel();
                       }
@@ -410,12 +348,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                         Container(
                           height: screenSize.height * 0.30,
                           decoration: BoxDecoration(
-                            boxShadow: const [
-                              BoxShadow(
-                                  color: Colors.black,
-                                  blurRadius: 10,
-                                  spreadRadius: -7)
-                            ],
+                            boxShadow: const [BoxShadow(color: Colors.black, blurRadius: 10, spreadRadius: -7)],
                             borderRadius: BorderRadius.circular(20),
                             color: ColorUtils.themeColor.oxffFFFFFF,
                           ),
@@ -433,7 +366,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                           child: Text(
                             'LOAN\nCALCULATOR',
                             textAlign: TextAlign.center,
-                            style: FontUtils.h20(fontWeight: FWT.bold,fontColor: ColorUtils.themeColor.oxff000000),
+                            style: FontUtils.h20(fontWeight: FWT.bold, fontColor: ColorUtils.themeColor.oxff000000),
                           ),
                         ),
                       ],

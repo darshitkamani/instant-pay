@@ -1,8 +1,9 @@
-import 'dart:async';
-
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
 import 'package:action_broadcast/action_broadcast.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:facebook_audience_network/facebook_audience_network.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:instant_pay/l10n/locale_keys.g.dart';
 import 'package:instant_pay/utilities/assets/asset_utils.dart';
@@ -11,40 +12,28 @@ import 'package:instant_pay/utilities/font/font_utils.dart';
 import 'package:instant_pay/utilities/routes/route_utils.dart';
 import 'package:instant_pay/utilities/storage/storage.dart';
 import 'package:instant_pay/view/screen/dashboard/home/model/available_ads_response.dart';
-import 'package:instant_pay/view/widget/ads_widget/fb_native_add.dart';
 import 'package:instant_pay/view/widget/ads_widget/interstitial_ads_widget.dart';
 import 'package:instant_pay/view/widget/ads_widget/load_ads_by_api.dart';
 import 'package:instant_pay/view/widget/center_text_button_widget.dart';
 import 'package:provider/provider.dart';
 
-import 'package:facebook_audience_network/facebook_audience_network.dart';
-import 'package:flutter/foundation.dart';
-
 class LoanApplicationProcessScreen extends StatefulWidget {
   const LoanApplicationProcessScreen({super.key});
 
   @override
-  State<LoanApplicationProcessScreen> createState() =>
-      _LoanApplicationProcessScreenState();
+  State<LoanApplicationProcessScreen> createState() => _LoanApplicationProcessScreenState();
 }
 
-class _LoanApplicationProcessScreenState
-    extends State<LoanApplicationProcessScreen> {
+class _LoanApplicationProcessScreenState extends State<LoanApplicationProcessScreen> {
   String screenName = "LoanProcessAdvice";
-  bool isFacebookAdsShow =
-      StorageUtils.prefs.getBool(StorageKeyUtils.isShowFacebookAds) ?? false;
-  bool isADXAdsShow =
-      StorageUtils.prefs.getBool(StorageKeyUtils.isShowADXAds) ?? false;
-  bool isAdmobAdsShow =
-      StorageUtils.prefs.getBool(StorageKeyUtils.isShowAdmobAds) ?? false;
-  bool isAdShow =
-      StorageUtils.prefs.getBool(StorageKeyUtils.isAddShowInApp) ?? false;
+  bool isFacebookAdsShow = StorageUtils.prefs.getBool(StorageKeyUtils.isShowFacebookAds) ?? false;
+  bool isADXAdsShow = StorageUtils.prefs.getBool(StorageKeyUtils.isShowADXAds) ?? false;
+  bool isAdmobAdsShow = StorageUtils.prefs.getBool(StorageKeyUtils.isShowAdmobAds) ?? false;
+  bool isAdShow = StorageUtils.prefs.getBool(StorageKeyUtils.isAddShowInApp) ?? false;
   // List<String> availableAdsList = [];
   MyAdsIdClass myAdsIdClass = MyAdsIdClass();
   late StreamSubscription receiver;
-  bool isCheckScreen =
-      StorageUtils.prefs.getBool(StorageKeyUtils.isCheckScreenForAdInApp) ??
-          false;
+  bool isCheckScreen = StorageUtils.prefs.getBool(StorageKeyUtils.isCheckScreenForAdInApp) ?? false;
 
   @override
   void initState() {
@@ -52,11 +41,12 @@ class _LoanApplicationProcessScreenState
     initReceiver();
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      final provider =
-          Provider.of<InterstitialAdsWidgetProvider>(context, listen: false);
+      if (!kDebugMode) {
+        await FirebaseAnalytics.instance.logEvent(name: screenName);
+      }
+      final provider = Provider.of<InterstitialAdsWidgetProvider>(context, listen: false);
 
-      myAdsIdClass = await LoadAdsByApi()
-          .isAvailableAds(context: context, screenName: screenName);
+      myAdsIdClass = await LoadAdsByApi().isAvailableAds(context: context, screenName: screenName);
       setState(() {});
 
       if (myAdsIdClass.availableAdsList.contains("Native")) {
@@ -64,7 +54,7 @@ class _LoanApplicationProcessScreenState
         //   _showFBNativeAd();
         // }
         // if (isAdmobAdsShow || isADXAdsShow) {
-        //   loadAdxNativeAd();
+        //   loadAdxNativeAd(); 
         //   loadAdxNativeAd1();
         // }
         ///New Code
@@ -82,28 +72,14 @@ class _LoanApplicationProcessScreenState
       }
       if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
         if (isCheckScreen) {
-          provider.loadFBInterstitialAd(
-              myAdsIdClass: myAdsIdClass,
-              screenName: screenName,
-              fbID: myAdsIdClass.facebookInterstitialId,
-              googleID: myAdsIdClass.googleInterstitialId);
+          provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
         } else {
-          print(
-              "myAdsIdClass.isFacebook && isFacebookAdsShow interstitial screenName --> $screenName --> ${myAdsIdClass.isFacebook} $isFacebookAdsShow");
+          print("myAdsIdClass.isFacebook && isFacebookAdsShow interstitial screenName --> $screenName --> ${myAdsIdClass.isFacebook} $isFacebookAdsShow");
           if (myAdsIdClass.isFacebook && isFacebookAdsShow) {
-            provider.loadFBInterstitialAd(
-                myAdsIdClass: myAdsIdClass,
-                screenName: screenName,
-                fbID: myAdsIdClass.facebookInterstitialId,
-                googleID: myAdsIdClass.googleInterstitialId);
+            provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
           }
           if (myAdsIdClass.isGoogle && isADXAdsShow) {
-            provider.loadAdxInterstitialAd(
-                myAdsIdClass: myAdsIdClass,
-                screenName: screenName,
-                context: context,
-                fbInterID: myAdsIdClass.facebookInterstitialId,
-                googleInterID: myAdsIdClass.googleInterstitialId);
+            provider.loadAdxInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, context: context, fbInterID: myAdsIdClass.facebookInterstitialId, googleInterID: myAdsIdClass.googleInterstitialId);
           }
         }
       }
@@ -115,38 +91,21 @@ class _LoanApplicationProcessScreenState
       print('$screenName Data ----> ${intent.extras}');
       switch (intent.action) {
         case 'LoadAd':
-          final provider = Provider.of<InterstitialAdsWidgetProvider>(context,
-              listen: false);
-          myAdsIdClass = await LoadAdsByApi()
-              .isAvailableAds(context: context, screenName: screenName);
+          final provider = Provider.of<InterstitialAdsWidgetProvider>(context, listen: false);
+          myAdsIdClass = await LoadAdsByApi().isAvailableAds(context: context, screenName: screenName);
           setState(() {});
-          print(
-              'myAdsIdClass.isGoogle && isADXAdsShow --> ${myAdsIdClass.isGoogle && isADXAdsShow} myAdsIdClass .isFacebook && isFacebookAdsShow --> ${myAdsIdClass.isFacebook && isFacebookAdsShow}isCheckScreen --> $isCheckScreen myAdsIdClass.availableAdsList.contains("Interstitial") --> ${myAdsIdClass.availableAdsList.contains("Interstitial")}');
+          print('myAdsIdClass.isGoogle && isADXAdsShow --> ${myAdsIdClass.isGoogle && isADXAdsShow} myAdsIdClass .isFacebook && isFacebookAdsShow --> ${myAdsIdClass.isFacebook && isFacebookAdsShow}isCheckScreen --> $isCheckScreen myAdsIdClass.availableAdsList.contains("Interstitial") --> ${myAdsIdClass.availableAdsList.contains("Interstitial")}');
 
           if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
             if (isCheckScreen) {
-              provider.loadFBInterstitialAd(
-                  myAdsIdClass: myAdsIdClass,
-                  screenName: screenName,
-                  fbID: myAdsIdClass.facebookInterstitialId,
-                  googleID: myAdsIdClass.googleInterstitialId);
+              provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
             } else {
-              print(
-                  "myAdsIdClass.isFacebook && isFacebookAdsShow in receiver interstitial screenName --> $screenName --> ${myAdsIdClass.isFacebook} $isFacebookAdsShow");
+              print("myAdsIdClass.isFacebook && isFacebookAdsShow in receiver interstitial screenName --> $screenName --> ${myAdsIdClass.isFacebook} $isFacebookAdsShow");
               if (myAdsIdClass.isFacebook && isFacebookAdsShow) {
-                provider.loadFBInterstitialAd(
-                    myAdsIdClass: myAdsIdClass,
-                    screenName: screenName,
-                    fbID: myAdsIdClass.facebookInterstitialId,
-                    googleID: myAdsIdClass.googleInterstitialId);
+                provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
               }
               if (myAdsIdClass.isGoogle && isADXAdsShow) {
-                provider.loadAdxInterstitialAd(
-                    myAdsIdClass: myAdsIdClass,
-                    screenName: screenName,
-                    context: context,
-                    fbInterID: myAdsIdClass.facebookInterstitialId,
-                    googleInterID: myAdsIdClass.googleInterstitialId);
+                provider.loadAdxInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, context: context, fbInterID: myAdsIdClass.facebookInterstitialId, googleInterID: myAdsIdClass.googleInterstitialId);
               }
             }
           }
@@ -167,9 +126,7 @@ class _LoanApplicationProcessScreenState
   //   updatePrefsResponse(adType: 'Native');
   // }
   _showFBNativeAd({required String isCalledFrom}) {
-    bool isFailedTwiceToLoadFbAdId = StorageUtils.prefs.getBool(
-            '${StorageKeyUtils.isFailedTwiceToLoadFbAdId}${myAdsIdClass.facebookNativeId}') ??
-        false;
+    bool isFailedTwiceToLoadFbAdId = StorageUtils.prefs.getBool('${StorageKeyUtils.isFailedTwiceToLoadFbAdId}${myAdsIdClass.facebookNativeId}') ?? false;
 
     if (myAdsIdClass.facebookNativeId.isEmpty || isFailedTwiceToLoadFbAdId) {
       loadAdxNativeAd(isCalledFrom: isCalledFrom);
@@ -185,15 +142,10 @@ class _LoanApplicationProcessScreenState
 
   updatePrefsResponse({required String adType}) {
     Timer(const Duration(seconds: 1), () {
-      isFacebookAdsShow =
-          StorageUtils.prefs.getBool(StorageKeyUtils.isShowFacebookAds) ??
-              false;
-      isADXAdsShow =
-          StorageUtils.prefs.getBool(StorageKeyUtils.isShowADXAds) ?? false;
-      isAdmobAdsShow =
-          StorageUtils.prefs.getBool(StorageKeyUtils.isShowAdmobAds) ?? false;
-      isAdShow =
-          StorageUtils.prefs.getBool(StorageKeyUtils.isAddShowInApp) ?? false;
+      isFacebookAdsShow = StorageUtils.prefs.getBool(StorageKeyUtils.isShowFacebookAds) ?? false;
+      isADXAdsShow = StorageUtils.prefs.getBool(StorageKeyUtils.isShowADXAds) ?? false;
+      isAdmobAdsShow = StorageUtils.prefs.getBool(StorageKeyUtils.isShowAdmobAds) ?? false;
+      isAdShow = StorageUtils.prefs.getBool(StorageKeyUtils.isAddShowInApp) ?? false;
       setState(() {});
       if (isAdmobAdsShow) {
         setState(() {
@@ -231,8 +183,7 @@ class _LoanApplicationProcessScreenState
   bool _isAdxNativeAdLoaded1 = false;
 
   loadAdxNativeAd({String isCalledFrom = 'init'}) async {
-    print(
-        'Screen name loadNativeAd() ---> $screenName isCalledFrom --> $isCalledFrom ');
+    print('Screen name loadNativeAd() ---> $screenName isCalledFrom --> $isCalledFrom ');
 
     String nativeAdId = myAdsIdClass.googleNativeId;
     // AdsUnitId().getGoogleNativeAdId();
@@ -260,8 +211,7 @@ class _LoanApplicationProcessScreenState
   }
 
   loadAdxNativeAd1({String isCalledFrom = 'init'}) async {
-    print(
-        'Screen name loadNativeAd1() ---> $screenName isCalledFrom --> $isCalledFrom ');
+    print('Screen name loadNativeAd1() ---> $screenName isCalledFrom --> $isCalledFrom ');
     String nativeAdId = myAdsIdClass.googleNativeId;
     // AdsUnitId().getGoogleNativeAdId();
     if (nativeAdId != '') {
@@ -288,8 +238,7 @@ class _LoanApplicationProcessScreenState
   }
 
   Widget loadFbNativeAd(String adId, {String isCalledFrom = 'init'}) {
-    print(
-        'Screen name loadFbNativeAd() ---> $screenName isCalledFrom -->$isCalledFrom ');
+    print('Screen name loadFbNativeAd() ---> $screenName isCalledFrom -->$isCalledFrom ');
 
     String nativeAdId = adId;
     // AdsUnitId().getFacebookNativeAdId();
@@ -321,13 +270,10 @@ class _LoanApplicationProcessScreenState
           StorageUtils.prefs.setBool(StorageKeyUtils.isShowFacebookAds, false);
           StorageUtils.prefs.setBool(StorageKeyUtils.isShowADXAds, true);
           StorageUtils.prefs.setBool(StorageKeyUtils.isShowAdmobAds, true);
-          bool isFailedTwiceToLoadFbAdId = StorageUtils.prefs.getBool(
-                  '${StorageKeyUtils.isFailedTwiceToLoadFbAdId}$adId') ??
-              false;
+          bool isFailedTwiceToLoadFbAdId = StorageUtils.prefs.getBool('${StorageKeyUtils.isFailedTwiceToLoadFbAdId}$adId') ?? false;
 
           if (!isFailedTwiceToLoadFbAdId) {
-            StorageUtils.prefs.setBool(
-                '${StorageKeyUtils.isFailedTwiceToLoadFbAdId}$adId', true);
+            StorageUtils.prefs.setBool('${StorageKeyUtils.isFailedTwiceToLoadFbAdId}$adId', true);
             loadAdxNativeAd(isCalledFrom: 'fbNativeFunction');
           }
         }
@@ -375,8 +321,7 @@ class _LoanApplicationProcessScreenState
                   ),
                   const Divider(thickness: 2),
                   Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
                     child: ListView.builder(
                       padding: EdgeInsets.zero,
                       physics: const NeverScrollableScrollPhysics(),
@@ -387,8 +332,7 @@ class _LoanApplicationProcessScreenState
                             ? Column(
                                 children: [
                                   fbNativeAd1,
-                                  adxNativeAd1 == null ||
-                                          _isAdxNativeAdLoaded1 == false
+                                  adxNativeAd1 == null || _isAdxNativeAdLoaded1 == false
                                       ? const SizedBox()
                                       : Container(
                                           color: Colors.transparent,
@@ -401,8 +345,7 @@ class _LoanApplicationProcessScreenState
                             : loanProcess[index]['img'] == '' && index == 4
                                 ? isFacebookAdsShow
                                     ? fbNativeAd
-                                    : adxNativeAd == null ||
-                                            _isAdxNativeAdLoaded == false
+                                    : adxNativeAd == null || _isAdxNativeAdLoaded == false
                                         ? const SizedBox()
                                         : Container(
                                             color: Colors.transparent,
@@ -413,53 +356,32 @@ class _LoanApplicationProcessScreenState
                                 : Column(
                                     children: [
                                       Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 30),
+                                        padding: const EdgeInsets.only(bottom: 30),
                                         child: Stack(
                                           clipBehavior: Clip.none,
                                           children: [
                                             Container(
                                               decoration: BoxDecoration(
-                                                border: Border.all(
-                                                    color: ColorUtils
-                                                        .themeColor.oxff447D58,
-                                                    width: 2),
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
+                                                border: Border.all(color: ColorUtils.themeColor.oxff447D58, width: 2),
+                                                borderRadius: BorderRadius.circular(10),
                                               ),
                                               child: Padding(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
+                                                  padding: const EdgeInsets.symmetric(
                                                     horizontal: 12,
                                                     vertical: 12,
                                                   ),
                                                   child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
-                                                      const SizedBox(
-                                                          height: 30),
+                                                      const SizedBox(height: 30),
                                                       Text(
-                                                        loanProcess[index]
-                                                                ['step'] ??
-                                                            '',
-                                                        style: FontUtils.h16(
-                                                            fontWeight:
-                                                                FWT.bold,
-                                                            fontColor: ColorUtils
-                                                                .themeColor
-                                                                .oxff101523),
+                                                        loanProcess[index]['step'] ?? '',
+                                                        style: FontUtils.h16(fontWeight: FWT.bold, fontColor: ColorUtils.themeColor.oxff101523),
                                                       ),
-                                                      const SizedBox(
-                                                          height: 10),
+                                                      const SizedBox(height: 10),
                                                       Text(
-                                                        loanProcess[index]
-                                                                ['guide'] ??
-                                                            '',
-                                                        style: FontUtils.h14(
-                                                            fontWeight:
-                                                                FWT.medium),
+                                                        loanProcess[index]['guide'] ?? '',
+                                                        style: FontUtils.h14(fontWeight: FWT.medium),
                                                       ),
                                                     ],
                                                   )),
@@ -469,26 +391,15 @@ class _LoanApplicationProcessScreenState
                                               left: 20,
                                               child: Container(
                                                 decoration: BoxDecoration(
-                                                  color:
-                                                      ColorUtils().greyBGColor,
-                                                  border: Border.all(
-                                                      color: ColorUtils
-                                                          .themeColor
-                                                          .oxff447D58,
-                                                      width: 2),
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
+                                                  color: ColorUtils().greyBGColor,
+                                                  border: Border.all(color: ColorUtils.themeColor.oxff447D58, width: 2),
+                                                  borderRadius: BorderRadius.circular(10),
                                                 ),
                                                 child: Padding(
-                                                  padding: const EdgeInsets
-                                                          .symmetric(
-                                                      vertical: 8,
-                                                      horizontal: 12),
+                                                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                                                   child: Text(
                                                     '${LocaleKeys.STEP.tr()} : ${loanProcess[index]['step_count']}',
-                                                    style: FontUtils.h14(
-                                                        fontWeight:
-                                                            FWT.semiBold),
+                                                    style: FontUtils.h14(fontWeight: FWT.semiBold),
                                                   ),
                                                 ),
                                               ),
@@ -497,9 +408,7 @@ class _LoanApplicationProcessScreenState
                                               top: 10,
                                               right: 20,
                                               child: Image(
-                                                image: AssetImage(
-                                                    loanProcess[index]['img'] ??
-                                                        ''),
+                                                image: AssetImage(loanProcess[index]['img'] ?? ''),
                                                 height: 60,
                                               ),
                                             ),
@@ -514,9 +423,7 @@ class _LoanApplicationProcessScreenState
                   CenterTextButtonWidget(
                     title: LocaleKeys.NEXT.tr(),
                     onTap: () {
-                      final provider =
-                          Provider.of<InterstitialAdsWidgetProvider>(context,
-                              listen: false);
+                      final provider = Provider.of<InterstitialAdsWidgetProvider>(context, listen: false);
                       if (receiver != null) {
                         receiver.cancel();
                       }

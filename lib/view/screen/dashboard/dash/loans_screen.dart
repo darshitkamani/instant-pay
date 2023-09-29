@@ -1,10 +1,9 @@
-import 'dart:async';
-
+import 'package:action_broadcast/action_broadcast.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:facebook_audience_network/facebook_audience_network.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:action_broadcast/action_broadcast.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:instant_pay/l10n/locale_keys.g.dart';
 import 'package:instant_pay/utilities/assets/asset_utils.dart';
@@ -14,7 +13,6 @@ import 'package:instant_pay/utilities/storage/storage.dart';
 import 'package:instant_pay/view/screen/dashboard/dash/insurance_scrren.dart';
 import 'package:instant_pay/view/screen/dashboard/home/loan_short_description_screen.dart';
 import 'package:instant_pay/view/screen/dashboard/home/model/available_ads_response.dart';
-import 'package:instant_pay/view/widget/ads_widget/fb_native_add.dart';
 import 'package:instant_pay/view/widget/ads_widget/interstitial_ads_widget.dart';
 import 'package:instant_pay/view/widget/ads_widget/load_ads_by_api.dart';
 import 'package:instant_pay/view/widget/bounce_click_widget.dart';
@@ -32,17 +30,11 @@ class LoansScreen extends StatefulWidget {
 class _LoansScreenState extends State<LoansScreen> {
   // DashboardMoreLoans
   String screenName = "DashboardMoreLoans";
-  bool isFacebookAdsShow =
-      StorageUtils.prefs.getBool(StorageKeyUtils.isShowFacebookAds) ?? false;
-  bool isADXAdsShow =
-      StorageUtils.prefs.getBool(StorageKeyUtils.isShowADXAds) ?? false;
-  bool isAdmobAdsShow =
-      StorageUtils.prefs.getBool(StorageKeyUtils.isShowAdmobAds) ?? false;
-  bool isAdShow =
-      StorageUtils.prefs.getBool(StorageKeyUtils.isAddShowInApp) ?? false;
-  bool isCheckScreen =
-      StorageUtils.prefs.getBool(StorageKeyUtils.isCheckScreenForAdInApp) ??
-          false;
+  bool isFacebookAdsShow = StorageUtils.prefs.getBool(StorageKeyUtils.isShowFacebookAds) ?? false;
+  bool isADXAdsShow = StorageUtils.prefs.getBool(StorageKeyUtils.isShowADXAds) ?? false;
+  bool isAdmobAdsShow = StorageUtils.prefs.getBool(StorageKeyUtils.isShowAdmobAds) ?? false;
+  bool isAdShow = StorageUtils.prefs.getBool(StorageKeyUtils.isAddShowInApp) ?? false;
+  bool isCheckScreen = StorageUtils.prefs.getBool(StorageKeyUtils.isCheckScreenForAdInApp) ?? false;
 
   // List<String> availableAdsList = [];
   MyAdsIdClass myAdsIdClass = MyAdsIdClass();
@@ -53,11 +45,12 @@ class _LoansScreenState extends State<LoansScreen> {
     initReceiver();
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      final provider =
-          Provider.of<InterstitialAdsWidgetProvider>(context, listen: false);
+      if (!kDebugMode) {
+        await FirebaseAnalytics.instance.logEvent(name: screenName);
+      }
+      final provider = Provider.of<InterstitialAdsWidgetProvider>(context, listen: false);
 
-      myAdsIdClass = await LoadAdsByApi()
-          .isAvailableAds(context: context, screenName: screenName);
+      myAdsIdClass = await LoadAdsByApi().isAvailableAds(context: context, screenName: screenName);
 
       setState(() {});
 
@@ -84,28 +77,14 @@ class _LoansScreenState extends State<LoansScreen> {
 
       if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
         if (isCheckScreen) {
-          provider.loadFBInterstitialAd(
-              myAdsIdClass: myAdsIdClass,
-              screenName: screenName,
-              fbID: myAdsIdClass.facebookInterstitialId,
-              googleID: myAdsIdClass.googleInterstitialId);
+          provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
         } else {
-          print(
-              "myAdsIdClass.isFacebook && isFacebookAdsShow interstitial screenName --> $screenName --> ${myAdsIdClass.isFacebook} $isFacebookAdsShow");
+          print("myAdsIdClass.isFacebook && isFacebookAdsShow interstitial screenName --> $screenName --> ${myAdsIdClass.isFacebook} $isFacebookAdsShow");
           if (myAdsIdClass.isFacebook && isFacebookAdsShow) {
-            provider.loadFBInterstitialAd(
-                myAdsIdClass: myAdsIdClass,
-                screenName: screenName,
-                fbID: myAdsIdClass.facebookInterstitialId,
-                googleID: myAdsIdClass.googleInterstitialId);
+            provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
           }
           if (myAdsIdClass.isGoogle && isADXAdsShow) {
-            provider.loadAdxInterstitialAd(
-                myAdsIdClass: myAdsIdClass,
-                screenName: screenName,
-                context: context,
-                fbInterID: myAdsIdClass.facebookInterstitialId,
-                googleInterID: myAdsIdClass.googleInterstitialId);
+            provider.loadAdxInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, context: context, fbInterID: myAdsIdClass.facebookInterstitialId, googleInterID: myAdsIdClass.googleInterstitialId);
           }
         }
       }
@@ -117,35 +96,19 @@ class _LoansScreenState extends State<LoansScreen> {
       print('$screenName Data ----> ${intent.extras}');
       switch (intent.action) {
         case 'LoadAd':
-          final provider = Provider.of<InterstitialAdsWidgetProvider>(context,
-              listen: false);
-          myAdsIdClass = await LoadAdsByApi()
-              .isAvailableAds(context: context, screenName: screenName);
+          final provider = Provider.of<InterstitialAdsWidgetProvider>(context, listen: false);
+          myAdsIdClass = await LoadAdsByApi().isAvailableAds(context: context, screenName: screenName);
           setState(() {});
           if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
             if (isCheckScreen) {
-              provider.loadFBInterstitialAd(
-                  myAdsIdClass: myAdsIdClass,
-                  screenName: screenName,
-                  fbID: myAdsIdClass.facebookInterstitialId,
-                  googleID: myAdsIdClass.googleInterstitialId);
+              provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
             } else {
-              print(
-                  "myAdsIdClass.isFacebook && isFacebookAdsShow in receiver interstitial screenName --> $screenName --> ${myAdsIdClass.isFacebook} $isFacebookAdsShow");
+              print("myAdsIdClass.isFacebook && isFacebookAdsShow in receiver interstitial screenName --> $screenName --> ${myAdsIdClass.isFacebook} $isFacebookAdsShow");
               if (myAdsIdClass.isFacebook && isFacebookAdsShow) {
-                provider.loadFBInterstitialAd(
-                    myAdsIdClass: myAdsIdClass,
-                    screenName: screenName,
-                    fbID: myAdsIdClass.facebookInterstitialId,
-                    googleID: myAdsIdClass.googleInterstitialId);
+                provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
               }
               if (myAdsIdClass.isGoogle && isADXAdsShow) {
-                provider.loadAdxInterstitialAd(
-                    myAdsIdClass: myAdsIdClass,
-                    screenName: screenName,
-                    context: context,
-                    fbInterID: myAdsIdClass.facebookInterstitialId,
-                    googleInterID: myAdsIdClass.googleInterstitialId);
+                provider.loadAdxInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, context: context, fbInterID: myAdsIdClass.facebookInterstitialId, googleInterID: myAdsIdClass.googleInterstitialId);
               }
             }
           }
@@ -164,9 +127,7 @@ class _LoansScreenState extends State<LoansScreen> {
   //   updatePrefsResponse(adType: 'Native');
   // }
   _showFBNativeAd({required String isCalledFrom}) {
-    bool isFailedTwiceToLoadFbAdId = StorageUtils.prefs.getBool(
-            '${StorageKeyUtils.isFailedTwiceToLoadFbAdId}${myAdsIdClass.facebookNativeId}') ??
-        false;
+    bool isFailedTwiceToLoadFbAdId = StorageUtils.prefs.getBool('${StorageKeyUtils.isFailedTwiceToLoadFbAdId}${myAdsIdClass.facebookNativeId}') ?? false;
 
     if (myAdsIdClass.facebookNativeId.isEmpty || isFailedTwiceToLoadFbAdId) {
       loadAdxNativeAd(isCalledFrom: isCalledFrom);
@@ -179,8 +140,7 @@ class _LoansScreenState extends State<LoansScreen> {
   }
 
   Widget loadFbNativeAd(String adId, {String isCalledFrom = 'init'}) {
-    print(
-        'Screen name loadFbNativeAd() ---> $screenName isCalledFrom -->$isCalledFrom ');
+    print('Screen name loadFbNativeAd() ---> $screenName isCalledFrom -->$isCalledFrom ');
 
     String nativeAdId = adId;
     // AdsUnitId().getFacebookNativeAdId();
@@ -212,13 +172,10 @@ class _LoansScreenState extends State<LoansScreen> {
           StorageUtils.prefs.setBool(StorageKeyUtils.isShowFacebookAds, false);
           StorageUtils.prefs.setBool(StorageKeyUtils.isShowADXAds, true);
           StorageUtils.prefs.setBool(StorageKeyUtils.isShowAdmobAds, true);
-          bool isFailedTwiceToLoadFbAdId = StorageUtils.prefs.getBool(
-                  '${StorageKeyUtils.isFailedTwiceToLoadFbAdId}$adId') ??
-              false;
+          bool isFailedTwiceToLoadFbAdId = StorageUtils.prefs.getBool('${StorageKeyUtils.isFailedTwiceToLoadFbAdId}$adId') ?? false;
 
           if (!isFailedTwiceToLoadFbAdId) {
-            StorageUtils.prefs.setBool(
-                '${StorageKeyUtils.isFailedTwiceToLoadFbAdId}$adId', true);
+            StorageUtils.prefs.setBool('${StorageKeyUtils.isFailedTwiceToLoadFbAdId}$adId', true);
             loadAdxNativeAd(isCalledFrom: 'fbNativeFunction');
           }
         }
@@ -229,15 +186,10 @@ class _LoansScreenState extends State<LoansScreen> {
 
   updatePrefsResponse({required String adType}) {
     Timer(const Duration(seconds: 1), () {
-      isFacebookAdsShow =
-          StorageUtils.prefs.getBool(StorageKeyUtils.isShowFacebookAds) ??
-              false;
-      isADXAdsShow =
-          StorageUtils.prefs.getBool(StorageKeyUtils.isShowADXAds) ?? false;
-      isAdmobAdsShow =
-          StorageUtils.prefs.getBool(StorageKeyUtils.isShowAdmobAds) ?? false;
-      isAdShow =
-          StorageUtils.prefs.getBool(StorageKeyUtils.isAddShowInApp) ?? false;
+      isFacebookAdsShow = StorageUtils.prefs.getBool(StorageKeyUtils.isShowFacebookAds) ?? false;
+      isADXAdsShow = StorageUtils.prefs.getBool(StorageKeyUtils.isShowADXAds) ?? false;
+      isAdmobAdsShow = StorageUtils.prefs.getBool(StorageKeyUtils.isShowAdmobAds) ?? false;
+      isAdShow = StorageUtils.prefs.getBool(StorageKeyUtils.isAddShowInApp) ?? false;
       setState(() {});
       if (isAdmobAdsShow) {
         setState(() {
@@ -266,8 +218,7 @@ class _LoansScreenState extends State<LoansScreen> {
   bool _isAdxNativeAdLoaded = false;
 
   loadAdxNativeAd({String isCalledFrom = 'init'}) async {
-    print(
-        'Screen name loadNativeAd() ---> $screenName isCalledFrom --> $isCalledFrom ');
+    print('Screen name loadNativeAd() ---> $screenName isCalledFrom --> $isCalledFrom ');
 
     String nativeAdId = myAdsIdClass.googleNativeId;
     // AdsUnitId().getGoogleNativeAdId();
@@ -318,13 +269,10 @@ class _LoansScreenState extends State<LoansScreen> {
               shrinkWrap: true,
               itemBuilder: (context, index) {
                 return Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   child: BounceClickWidget(
                     onTap: () {
-                      final provider =
-                          Provider.of<InterstitialAdsWidgetProvider>(context,
-                              listen: false);
+                      final provider = Provider.of<InterstitialAdsWidgetProvider>(context, listen: false);
                       if (receiver != null) {
                         receiver.cancel();
                       }
@@ -351,34 +299,26 @@ class _LoansScreenState extends State<LoansScreen> {
                             width: screenSize.width,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
-                              color: Colors
-                                  .accents[index % Colors.accents.length]
-                                  .withOpacity(0.3),
+                              color: Colors.accents[index % Colors.accents.length].withOpacity(0.3),
                             ),
                             child: Center(
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 8, horizontal: 24),
+                                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
                                 child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        loansDataList[index]
-                                            .name!
-                                            .toUpperCase(),
+                                        loansDataList[index].name!.toUpperCase(),
                                         style: FontUtils.h16(
-                                          fontColor:
-                                              ColorUtils.themeColor.oxff000000,
+                                          fontColor: ColorUtils.themeColor.oxff000000,
                                           fontWeight: FWT.bold,
                                           letterSpacing: 1.5,
                                         ),
                                       ),
                                     ),
                                     Image(
-                                      image:
-                                          AssetImage(loansDataList[index].img!),
+                                      image: AssetImage(loansDataList[index].img!),
                                       height: 50,
                                       width: 50,
                                     ),
@@ -409,8 +349,7 @@ class _LoansScreenState extends State<LoansScreen> {
         loanName: LocaleKeys.studentLoans.tr(),
         isAdvantage: true,
         titleList: parseStringToList(LocaleKeys.studentLoansTitleList.tr()),
-        titleOverViewList:
-            parseStringToList(LocaleKeys.studentLoansTitleOverViewList.tr()),
+        titleOverViewList: parseStringToList(LocaleKeys.studentLoansTitleOverViewList.tr()),
         takePoints: parseStringToList(LocaleKeys.studentLoansTakePoints.tr()),
         take: parseStringToList(LocaleKeys.studentLoansTake.tr()),
       ),
@@ -423,8 +362,7 @@ class _LoansScreenState extends State<LoansScreen> {
         loanName: LocaleKeys.aadharLoans.tr(),
         isAdvantage: true,
         titleList: parseStringToList(LocaleKeys.aadharLoansTitleList.tr()),
-        titleOverViewList:
-            parseStringToList(LocaleKeys.aadharLoansTitleOverViewList.tr()),
+        titleOverViewList: parseStringToList(LocaleKeys.aadharLoansTitleOverViewList.tr()),
         takePoints: parseStringToList(LocaleKeys.aadharLoansTakePoints.tr()),
         take: parseStringToList(LocaleKeys.aadharLoansTake.tr()),
       ),
@@ -437,8 +375,7 @@ class _LoansScreenState extends State<LoansScreen> {
         loanName: LocaleKeys.educationLoans.tr(),
         isAdvantage: true,
         titleList: parseStringToList(LocaleKeys.studentLoansTitleList.tr()),
-        titleOverViewList:
-            parseStringToList(LocaleKeys.studentLoansTitleOverViewList.tr()),
+        titleOverViewList: parseStringToList(LocaleKeys.studentLoansTitleOverViewList.tr()),
         takePoints: parseStringToList(LocaleKeys.studentLoansTakePoints.tr()),
         take: parseStringToList(LocaleKeys.studentLoansTake.tr()),
       ),
@@ -451,8 +388,7 @@ class _LoansScreenState extends State<LoansScreen> {
         loanName: LocaleKeys.carLoans.tr(),
         isAdvantage: true,
         titleList: parseStringToList(LocaleKeys.carLoansTitleList.tr()),
-        titleOverViewList:
-            parseStringToList(LocaleKeys.carLoansTitleOverViewList.tr()),
+        titleOverViewList: parseStringToList(LocaleKeys.carLoansTitleOverViewList.tr()),
         takePoints: parseStringToList(LocaleKeys.carLoansTakePoints.tr()),
         take: parseStringToList(LocaleKeys.carLoansTake.tr()),
       ),
@@ -465,8 +401,7 @@ class _LoansScreenState extends State<LoansScreen> {
         loanName: LocaleKeys.goldLoans.tr(),
         isAdvantage: true,
         titleList: parseStringToList(LocaleKeys.goldLoansTitleList.tr()),
-        titleOverViewList:
-            parseStringToList(LocaleKeys.goldLoansTitleOverViewList.tr()),
+        titleOverViewList: parseStringToList(LocaleKeys.goldLoansTitleOverViewList.tr()),
         takePoints: parseStringToList(LocaleKeys.goldLoansTakePoints.tr()),
         take: parseStringToList(LocaleKeys.goldLoansTake.tr()),
       ),
@@ -479,8 +414,7 @@ class _LoansScreenState extends State<LoansScreen> {
         loanName: LocaleKeys.paydayLoans.tr(),
         isAdvantage: true,
         titleList: parseStringToList(LocaleKeys.paydayLoansTitleList.tr()),
-        titleOverViewList:
-            parseStringToList(LocaleKeys.paydayLoansTitleOverViewList.tr()),
+        titleOverViewList: parseStringToList(LocaleKeys.paydayLoansTitleOverViewList.tr()),
         takePoints: parseStringToList(LocaleKeys.paydayLoansTakePoints.tr()),
         take: parseStringToList(LocaleKeys.paydayLoansTake.tr()),
       ),
@@ -489,7 +423,6 @@ class _LoansScreenState extends State<LoansScreen> {
 }
 
 List<String> parseStringToList(String inputString) {
-  List<String> resultList =
-      inputString.substring(1, inputString.length - 2).split("','");
+  List<String> resultList = inputString.substring(1, inputString.length - 2).split("','");
   return resultList;
 }

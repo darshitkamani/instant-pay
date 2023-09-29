@@ -1,5 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:facebook_audience_network/facebook_audience_network.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -11,12 +14,14 @@ import 'package:instant_pay/view/screen/splash/view/splash_screen.dart';
 import 'package:instant_pay/view/widget/internet_connectivity_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'utilities/routes/provider_bindings.dart';
 import 'utilities/routes/route_utils.dart';
 
 ///
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   await EasyLocalization.ensureInitialized();
 
   await dotenv.load(fileName: ".env");
@@ -24,15 +29,13 @@ void main() async {
   MobileAds.instance.initialize();
   ColorUtils.themeColor = LightTheme();
   StorageUtils.prefs = await SharedPreferences.getInstance();
-  MobileAds.instance.updateRequestConfiguration(RequestConfiguration(
-      testDeviceIds: ['294449C3CD34F90F1EA87EF0A43723A7']));
+  MobileAds.instance.updateRequestConfiguration(RequestConfiguration(testDeviceIds: ['294449C3CD34F90F1EA87EF0A43723A7']));
   FacebookAudienceNetwork.init(
 
       // iOSAdvertiserTrackingEnabled: true //default false
       );
 
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-      .then((_) {
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) {
     return runApp(
       EasyLocalization(
           path: 'assets/translations',
@@ -55,14 +58,20 @@ class InstantPayApp extends StatefulWidget {
   State<InstantPayApp> createState() => _InstantPayAppState();
 }
 
-class _InstantPayAppState extends State<InstantPayApp>
-    with WidgetsBindingObserver {
+class _InstantPayAppState extends State<InstantPayApp> with WidgetsBindingObserver {
   late ConnectivityIndicatorWidget indicator;
+
+  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+  static FirebaseAnalyticsObserver observer = FirebaseAnalyticsObserver(analytics: analytics);
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {});
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      if (!kDebugMode) {
+        await analytics.logEvent(name: 'EVENT_STARTED');
+      }
+    });
   }
 
   @override
@@ -85,6 +94,7 @@ class _InstantPayAppState extends State<InstantPayApp>
           Locale('gu', 'IN'),
         ],
         builder: _builder,
+        navigatorObservers: [observer],
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
             scaffoldBackgroundColor: ColorUtils().greyBGColor,

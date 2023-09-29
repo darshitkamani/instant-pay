@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "128392373825",
+    "project_id": "instant-pay-b5fd5",
+    "storage_bucket": "instant-pay-b5fd5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:128392373825:android:5d583dcb6ea9ee7a8fc8c0",
+        "android_client_info": {
+          "package_name": "com.instant_pay_quick_loan_advisor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhshCWx4_Zr4Ut_txyLiZvtcMFkTj1J2A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

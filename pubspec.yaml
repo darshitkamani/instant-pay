@@ -33,6 +33,8 @@ dependencies:
   easy_localization: ^3.0.1
   switcher_button: ^0.0.4
   flutter_switch: ^0.3.2
+  firebase_core: ^2.16.0
+  firebase_analytics: ^10.5.0
 
 dev_dependencies:
   flutter_test:
