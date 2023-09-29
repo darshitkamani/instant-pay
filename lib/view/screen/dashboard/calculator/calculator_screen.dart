@@ -366,15 +366,15 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                             ),
                           ),
                         ),
-                        Positioned(
-                          left: 20,
-                          top: 60,
-                          child: Text(
-                            'EMI\nCALCULATOR',
-                            textAlign: TextAlign.center,
-                            style: FontUtils.h26(fontWeight: FWT.bold),
-                          ),
-                        ),
+                        // Positioned(
+                        //   left: 20,
+                        //   top: 60,
+                        //   child: Text(
+                        //     'EMI\nCALCULATOR',
+                        //     textAlign: TextAlign.center,
+                        //     style: FontUtils.h26(fontWeight: FWT.bold),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),
@@ -429,11 +429,11 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                         ),
                         Positioned(
                           left: 20,
-                          top: 60,
+                          top: 80,
                           child: Text(
-                            'LOAN\nELIGIBILITY\nCALCULATOR',
+                            'LOAN\nCALCULATOR',
                             textAlign: TextAlign.center,
-                            style: FontUtils.h26(fontWeight: FWT.bold),
+                            style: FontUtils.h20(fontWeight: FWT.bold,fontColor: ColorUtils.themeColor.oxff000000),
                           ),
                         ),
                       ],

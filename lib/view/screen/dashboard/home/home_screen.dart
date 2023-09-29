@@ -444,6 +444,15 @@ class _HomeScreenState extends State<HomeScreen> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
+                    fbNativeAdWidget,
+                    (adxNativeAdLoaded && adxNativeAd != null)
+                        ? Container(
+                            color: Colors.transparent,
+                            height: 330.0,
+                            alignment: Alignment.center,
+                            child: AdWidget(ad: adxNativeAd!),
+                          )
+                        : const SizedBox(),
                     const SizedBox(height: 20),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -463,7 +472,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: GridView.builder(
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
+                          crossAxisCount: 2,
+                          childAspectRatio: 1.5,
                           crossAxisSpacing: 2,
                           mainAxisSpacing: 2,
                         ),
@@ -476,7 +486,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             titleWidget: Image(
                               image: AssetImage(
                                   loanProductsImageList[index]['img']),
-                              height: 50,
+                              height: 60,
                             ),
                             onTap: () {
                               getLoanDetails(
@@ -487,16 +497,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    fbNativeAdWidget,
-                    (adxNativeAdLoaded && adxNativeAd != null)
-                        ? Container(
-                            color: Colors.transparent,
-                            height: 330.0,
-                            alignment: Alignment.center,
-                            child: AdWidget(ad: adxNativeAd!),
-                          )
-                        : const SizedBox(),
-                    const SizedBox(height: 10),
+                    
                     myWidget(AssetUtils.icMutualFundsDash, () {
                       getLoanDetails(mutualFundsGuidance);
                     }),
@@ -533,15 +534,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                             ),
-                            Positioned(
-                              left: 20,
-                              top: 60,
-                              child: Text(
-                                'FD\nCALCULATOR',
-                                textAlign: TextAlign.center,
-                                style: FontUtils.h26(fontWeight: FWT.bold),
-                              ),
-                            ),
+                            // Positioned(
+                            //   left: 20,
+                            //   top: 60,
+                            //   child: Text(
+                            //     'FD\nCALCULATOR',
+                            //     textAlign: TextAlign.center,
+                            //     style: FontUtils.h26(fontWeight: FWT.bold),
+                            //   ),
+                            // ),
                           ],
                         ),
                       ),

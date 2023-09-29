@@ -18,7 +18,7 @@ class SplashProvider extends ChangeNotifier {
       const Duration(seconds: 3),
       () async {
         await getApiData(context: context);
-        // Navigator.pushNamedAndRemoveUntil(context, RouteUtils.dashboardScreen, (route) => false);
+
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
