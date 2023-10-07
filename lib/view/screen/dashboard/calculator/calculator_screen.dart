@@ -65,6 +65,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
         }
       }
       if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
+        print('screenName $screenName === isCheckScreen -- $isCheckScreen === myAdsIdClass.isFacebook -- ${myAdsIdClass.isFacebook} === isFacebookAdsShow -- $isFacebookAdsShow === myAdsIdClass.isGoogle -- ${myAdsIdClass.isGoogle} === isADXAdsShow -- $isADXAdsShow');
         if (isCheckScreen) {
           provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
         } else {
@@ -151,9 +152,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   @override
   void dispose() {
     super.dispose();
-    if (receiver != null) {
-      receiver.cancel();
-    }
+    receiver.cancel();
 
     if (nativeAd != null) {
       nativeAd!.dispose();
@@ -169,7 +168,8 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       setState(() {
         nativeAd = NativeAd(
           adUnitId: nativeAdId,
-          factoryId: 'adFactory',
+          nativeAdOptions: NativeAdOptions(),
+          factoryId: 'listTileMedium',
           request: const AdRequest(),
           listener: NativeAdListener(
             onAdLoaded: (ad) {
@@ -260,12 +260,13 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
             physics: const BouncingScrollPhysics(),
             child: Column(
               children: [
+              const SizedBox(height: 10),
                 fbNativeBannerAd,
                 nativeAd == null || _nativeAdIsLoaded == false
                     ? const SizedBox()
                     : Container(
                         color: Colors.transparent,
-                        height: 330,
+                        height: 275,
                         alignment: Alignment.center,
                         child: AdWidget(ad: nativeAd!),
                       ),
@@ -276,9 +277,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                   child: BounceClickWidget(
                     onTap: () {
                       final provider = Provider.of<InterstitialAdsWidgetProvider>(context, listen: false);
-                      if (receiver != null) {
-                        receiver.cancel();
-                      }
+                      receiver.cancel();
 
                       provider.showFbOrAdxOrAdmobInterstitialAd(
                         RouteUtils.eMILoanCalculatorScreen,
@@ -330,9 +329,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                   child: BounceClickWidget(
                     onTap: () {
                       final provider = Provider.of<InterstitialAdsWidgetProvider>(context, listen: false);
-                      if (receiver != null) {
-                        receiver.cancel();
-                      }
+                      receiver.cancel();
 
                       provider.showFbOrAdxOrAdmobInterstitialAd(
                         RouteUtils.eligibilityLoanCalculatorScreen,

@@ -61,9 +61,9 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!kDebugMode) {}
     initReceiver();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-        if (!kDebugMode) {
-          await FirebaseAnalytics.instance.logEvent(name: screenName);
-        }
+      if (!kDebugMode) {
+        await FirebaseAnalytics.instance.logEvent(name: screenName);
+      }
       setState(() {
         int prefferedLanguage = StorageUtils.prefs.getInt(StorageKeyUtils.applicationLanguageState) ?? 0;
 
@@ -97,6 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       }
       if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
+        print('screenName $screenName === isCheckScreen -- $isCheckScreen === myAdsIdClass.isFacebook -- ${myAdsIdClass.isFacebook} === isFacebookAdsShow -- $isFacebookAdsShow === myAdsIdClass.isGoogle -- ${myAdsIdClass.isGoogle} === isADXAdsShow -- $isADXAdsShow');
         if (isCheckScreen) {
           provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
         } else {
@@ -121,6 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
           myAdsIdClass = await LoadAdsByApi().isAvailableAds(context: context, screenName: screenName);
           setState(() {});
           if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
+            print('screenName $screenName === isCheckScreen -- $isCheckScreen === myAdsIdClass.isFacebook -- ${myAdsIdClass.isFacebook} === isFacebookAdsShow -- $isFacebookAdsShow === myAdsIdClass.isGoogle -- ${myAdsIdClass.isGoogle} === isADXAdsShow -- $isADXAdsShow');
             if (isCheckScreen) {
               provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
             } else {
@@ -146,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         adxNativeAd = NativeAd(
           adUnitId: nativeAdId,
-          factoryId: 'adFactory',
+          factoryId: 'listTileMedium',
           request: const AdRequest(),
           listener: NativeAdListener(
             onAdLoaded: (ad) {
@@ -174,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         adxNativeAd1 = NativeAd(
           adUnitId: myAdsIdClass.googleNativeId, // nativeAdId,
-          factoryId: 'adFactory',
+          factoryId: 'listTileMedium',
           request: const AdRequest(),
           listener: NativeAdListener(
             onAdLoaded: (ad) {
@@ -373,11 +375,12 @@ class _HomeScreenState extends State<HomeScreen> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
+                  const SizedBox(height: 10),
                     fbNativeAdWidget,
                     (adxNativeAdLoaded && adxNativeAd != null)
                         ? Container(
                             color: Colors.transparent,
-                            height: 330.0,
+                            height: 275,
                             alignment: Alignment.center,
                             child: AdWidget(ad: adxNativeAd!),
                           )
@@ -464,11 +467,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 10),
                     fbNativeAdWidget1,
                     (adxNativeAdLoaded1 && adxNativeAd1 != null)
                         ? Container(
                             color: Colors.transparent,
-                            height: 330.0,
+                            height: 275,
                             alignment: Alignment.center,
                             child: AdWidget(ad: adxNativeAd1!),
                           )

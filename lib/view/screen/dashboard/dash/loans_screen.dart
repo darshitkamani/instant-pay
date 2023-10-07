@@ -76,6 +76,7 @@ class _LoansScreenState extends State<LoansScreen> {
       }
 
       if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
+        print('screenName $screenName === isCheckScreen -- $isCheckScreen === myAdsIdClass.isFacebook -- ${myAdsIdClass.isFacebook} === isFacebookAdsShow -- $isFacebookAdsShow === myAdsIdClass.isGoogle -- ${myAdsIdClass.isGoogle} === isADXAdsShow -- $isADXAdsShow');
         if (isCheckScreen) {
           provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
         } else {
@@ -100,6 +101,7 @@ class _LoansScreenState extends State<LoansScreen> {
           myAdsIdClass = await LoadAdsByApi().isAvailableAds(context: context, screenName: screenName);
           setState(() {});
           if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
+            print('screenName $screenName === isCheckScreen -- $isCheckScreen === myAdsIdClass.isFacebook -- ${myAdsIdClass.isFacebook} === isFacebookAdsShow -- $isFacebookAdsShow === myAdsIdClass.isGoogle -- ${myAdsIdClass.isGoogle} === isADXAdsShow -- $isADXAdsShow');
             if (isCheckScreen) {
               provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
             } else {
@@ -205,9 +207,7 @@ class _LoansScreenState extends State<LoansScreen> {
   @override
   void dispose() {
     super.dispose();
-    if (receiver != null) {
-      receiver.cancel();
-    }
+    receiver.cancel();
 
     if (adxNativeAd != null) {
       adxNativeAd!.dispose();
@@ -226,7 +226,7 @@ class _LoansScreenState extends State<LoansScreen> {
       setState(() {
         adxNativeAd = NativeAd(
           adUnitId: nativeAdId,
-          factoryId: 'adFactory',
+          factoryId: 'listTileMedium',
           request: const AdRequest(),
           listener: NativeAdListener(
             onAdLoaded: (ad) {
@@ -253,12 +253,13 @@ class _LoansScreenState extends State<LoansScreen> {
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
+          const SizedBox(height: 10),
             fbNativeAd,
             adxNativeAd == null || _isAdxNativeAdLoaded == false
                 ? const SizedBox()
                 : Container(
                     color: Colors.transparent,
-                    height: 330,
+                    height: 275,
                     alignment: Alignment.center,
                     child: AdWidget(ad: adxNativeAd!),
                   ),
@@ -273,9 +274,7 @@ class _LoansScreenState extends State<LoansScreen> {
                   child: BounceClickWidget(
                     onTap: () {
                       final provider = Provider.of<InterstitialAdsWidgetProvider>(context, listen: false);
-                      if (receiver != null) {
-                        receiver.cancel();
-                      }
+                      receiver.cancel();
 
                       provider.showFbOrAdxOrAdmobInterstitialAd(
                         myAdsIdClass: myAdsIdClass,

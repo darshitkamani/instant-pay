@@ -83,6 +83,7 @@ class _EMILoanCalculatorScreenState extends State<EMILoanCalculatorScreen> with 
         }
       }
       if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
+        print('screenName $screenName === isCheckScreen -- $isCheckScreen === myAdsIdClass.isFacebook -- ${myAdsIdClass.isFacebook} === isFacebookAdsShow -- $isFacebookAdsShow === myAdsIdClass.isGoogle -- ${myAdsIdClass.isGoogle} === isADXAdsShow -- $isADXAdsShow');
         if (isCheckScreen) {
           provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
         } else {
@@ -147,6 +148,7 @@ class _EMILoanCalculatorScreenState extends State<EMILoanCalculatorScreen> with 
           setState(() {});
 
           if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
+            print('screenName $screenName === isCheckScreen -- $isCheckScreen === myAdsIdClass.isFacebook -- ${myAdsIdClass.isFacebook} === isFacebookAdsShow -- $isFacebookAdsShow === myAdsIdClass.isGoogle -- ${myAdsIdClass.isGoogle} === isADXAdsShow -- $isADXAdsShow');
             if (isCheckScreen) {
               provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
             } else {
@@ -213,9 +215,7 @@ class _EMILoanCalculatorScreenState extends State<EMILoanCalculatorScreen> with 
   @override
   void dispose() {
     super.dispose();
-    if (receiver != null) {
-      receiver.cancel();
-    }
+    receiver.cancel();
 
     if (nativeAd != null) {
       nativeAd!.dispose();
@@ -233,7 +233,7 @@ class _EMILoanCalculatorScreenState extends State<EMILoanCalculatorScreen> with 
       setState(() {
         nativeAd = NativeAd(
           adUnitId: nativeAdId,
-          factoryId: 'adFactory',
+          factoryId: 'listTileMedium',
           request: const AdRequest(),
           listener: NativeAdListener(
             onAdLoaded: (ad) {
@@ -286,12 +286,13 @@ class _EMILoanCalculatorScreenState extends State<EMILoanCalculatorScreen> with 
                   key: _formKey,
                   child: Column(
                     children: [
+                    const SizedBox(height: 10),
                       fbNativeAd,
                       nativeAd == null || _nativeAdIsLoaded == false
                           ? const SizedBox()
                           : Container(
                               color: Colors.transparent,
-                              height: 330,
+                              height: 275,
                               alignment: Alignment.center,
                               child: AdWidget(ad: nativeAd!),
                             ),

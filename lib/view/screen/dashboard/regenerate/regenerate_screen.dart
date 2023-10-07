@@ -90,6 +90,7 @@ class _RegenerateScreenState extends State<RegenerateScreen> {
         }
       }
       if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
+        print('screenName $screenName === isCheckScreen -- $isCheckScreen === myAdsIdClass.isFacebook -- ${myAdsIdClass.isFacebook} === isFacebookAdsShow -- $isFacebookAdsShow === myAdsIdClass.isGoogle -- ${myAdsIdClass.isGoogle} === isADXAdsShow -- $isADXAdsShow');
         if (isCheckScreen) {
           provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
         } else {
@@ -114,6 +115,7 @@ class _RegenerateScreenState extends State<RegenerateScreen> {
           myAdsIdClass = await LoadAdsByApi().isAvailableAds(context: context, screenName: screenName);
           setState(() {});
           if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
+            print('screenName $screenName === isCheckScreen -- $isCheckScreen === myAdsIdClass.isFacebook -- ${myAdsIdClass.isFacebook} === isFacebookAdsShow -- $isFacebookAdsShow === myAdsIdClass.isGoogle -- ${myAdsIdClass.isGoogle} === isADXAdsShow -- $isADXAdsShow');
             if (isCheckScreen) {
               provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
             } else {
@@ -140,7 +142,7 @@ class _RegenerateScreenState extends State<RegenerateScreen> {
       setState(() {
         adxNativeAd = NativeAd(
           adUnitId: nativeAdId,
-          factoryId: 'adFactory',
+          factoryId: 'listTileMedium',
           request: const AdRequest(),
           listener: NativeAdListener(
             onAdLoaded: (ad) {
@@ -244,9 +246,7 @@ class _RegenerateScreenState extends State<RegenerateScreen> {
 
   @override
   void dispose() {
-    if (receiver != null) {
-      receiver.cancel();
-    }
+    receiver.cancel();
     if (adxNativeAd != null) {
       adxNativeAd!.dispose();
     }
@@ -302,11 +302,12 @@ class _RegenerateScreenState extends State<RegenerateScreen> {
                   physics: const BouncingScrollPhysics(),
                   child: Column(
                     children: [
+                    const SizedBox(height: 10),
                       fbNativeAd,
                       (adxNativeAdLoaded && adxNativeAd != null)
                           ? Container(
                               color: Colors.transparent,
-                              height: 330.0,
+                              height: 275,
                               alignment: Alignment.center,
                               child: AdWidget(ad: adxNativeAd!),
                             )
@@ -382,9 +383,7 @@ class _RegenerateScreenState extends State<RegenerateScreen> {
   ];
 
   getLoanDetails(String loanName) {
-    if (receiver != null) {
-      receiver.cancel();
-    }
+    receiver.cancel();
     final provider = Provider.of<InterstitialAdsWidgetProvider>(context, listen: false);
     switch (loanName) {
       case cashLoan:

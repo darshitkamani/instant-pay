@@ -54,7 +54,7 @@ class _LoanApplicationProcessScreenState extends State<LoanApplicationProcessScr
         //   _showFBNativeAd();
         // }
         // if (isAdmobAdsShow || isADXAdsShow) {
-        //   loadAdxNativeAd(); 
+        //   loadAdxNativeAd();
         //   loadAdxNativeAd1();
         // }
         ///New Code
@@ -71,6 +71,7 @@ class _LoanApplicationProcessScreenState extends State<LoanApplicationProcessScr
         }
       }
       if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
+        print('screenName $screenName === isCheckScreen -- $isCheckScreen === myAdsIdClass.isFacebook -- ${myAdsIdClass.isFacebook} === isFacebookAdsShow -- $isFacebookAdsShow === myAdsIdClass.isGoogle -- ${myAdsIdClass.isGoogle} === isADXAdsShow -- $isADXAdsShow');
         if (isCheckScreen) {
           provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
         } else {
@@ -97,6 +98,7 @@ class _LoanApplicationProcessScreenState extends State<LoanApplicationProcessScr
           print('myAdsIdClass.isGoogle && isADXAdsShow --> ${myAdsIdClass.isGoogle && isADXAdsShow} myAdsIdClass .isFacebook && isFacebookAdsShow --> ${myAdsIdClass.isFacebook && isFacebookAdsShow}isCheckScreen --> $isCheckScreen myAdsIdClass.availableAdsList.contains("Interstitial") --> ${myAdsIdClass.availableAdsList.contains("Interstitial")}');
 
           if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
+            print('screenName $screenName === isCheckScreen -- $isCheckScreen === myAdsIdClass.isFacebook -- ${myAdsIdClass.isFacebook} === isFacebookAdsShow -- $isFacebookAdsShow === myAdsIdClass.isGoogle -- ${myAdsIdClass.isGoogle} === isADXAdsShow -- $isADXAdsShow');
             if (isCheckScreen) {
               provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
             } else {
@@ -164,9 +166,7 @@ class _LoanApplicationProcessScreenState extends State<LoanApplicationProcessScr
   void dispose() {
     super.dispose();
 
-    if (receiver != null) {
-      receiver.cancel();
-    }
+    receiver.cancel();
 
     if (adxNativeAd != null) {
       adxNativeAd!.dispose();
@@ -191,7 +191,7 @@ class _LoanApplicationProcessScreenState extends State<LoanApplicationProcessScr
       setState(() {
         adxNativeAd = NativeAd(
           adUnitId: nativeAdId,
-          factoryId: 'adFactory',
+          factoryId: 'listTileMedium',
           request: const AdRequest(),
           listener: NativeAdListener(
             onAdLoaded: (ad) {
@@ -218,7 +218,7 @@ class _LoanApplicationProcessScreenState extends State<LoanApplicationProcessScr
       setState(() {
         adxNativeAd1 = NativeAd(
           adUnitId: nativeAdId,
-          factoryId: 'adFactory',
+          factoryId: 'listTileMedium',
           request: const AdRequest(),
           listener: NativeAdListener(
             onAdLoaded: (ad) {
@@ -331,28 +331,33 @@ class _LoanApplicationProcessScreenState extends State<LoanApplicationProcessScr
                         return loanProcess[index]['img'] == '' && index == 9
                             ? Column(
                                 children: [
+                                  const SizedBox(height: 10),
                                   fbNativeAd1,
                                   adxNativeAd1 == null || _isAdxNativeAdLoaded1 == false
                                       ? const SizedBox()
                                       : Container(
                                           color: Colors.transparent,
-                                          height: 370,
+                                          height: 275,
                                           alignment: Alignment.center,
                                           child: AdWidget(ad: adxNativeAd1!),
                                         ),
                                 ],
                               )
                             : loanProcess[index]['img'] == '' && index == 4
-                                ? isFacebookAdsShow
-                                    ? fbNativeAd
-                                    : adxNativeAd == null || _isAdxNativeAdLoaded == false
-                                        ? const SizedBox()
-                                        : Container(
-                                            color: Colors.transparent,
-                                            height: 340,
-                                            alignment: Alignment.center,
-                                            child: AdWidget(ad: adxNativeAd!),
-                                          )
+                                ? Column(
+                                    children: [
+                                      const SizedBox(height: 10),
+                                      fbNativeAd,
+                                      adxNativeAd == null || _isAdxNativeAdLoaded == false
+                                          ? const SizedBox()
+                                          : Container(
+                                              color: Colors.transparent,
+                                              height: 275,
+                                              alignment: Alignment.center,
+                                              child: AdWidget(ad: adxNativeAd!),
+                                            ),
+                                    ],
+                                  )
                                 : Column(
                                     children: [
                                       Padding(
@@ -424,9 +429,7 @@ class _LoanApplicationProcessScreenState extends State<LoanApplicationProcessScr
                     title: LocaleKeys.NEXT.tr(),
                     onTap: () {
                       final provider = Provider.of<InterstitialAdsWidgetProvider>(context, listen: false);
-                      if (receiver != null) {
-                        receiver.cancel();
-                      }
+                      receiver.cancel();
 
                       provider.showFbOrAdxOrAdmobInterstitialAd(
                         myAdsIdClass: myAdsIdClass,

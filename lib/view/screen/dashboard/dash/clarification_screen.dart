@@ -76,6 +76,7 @@ class _ClarificationScreenState extends State<ClarificationScreen> {
       }
 
       if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
+        print('screenName $screenName === isCheckScreen -- $isCheckScreen === myAdsIdClass.isFacebook -- ${myAdsIdClass.isFacebook} === isFacebookAdsShow -- $isFacebookAdsShow === myAdsIdClass.isGoogle -- ${myAdsIdClass.isGoogle} === isADXAdsShow -- $isADXAdsShow');
         if (isCheckScreen) {
           provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
         } else {
@@ -100,6 +101,7 @@ class _ClarificationScreenState extends State<ClarificationScreen> {
           myAdsIdClass = await LoadAdsByApi().isAvailableAds(context: context, screenName: screenName);
           setState(() {});
           if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
+            print('screenName $screenName === isCheckScreen -- $isCheckScreen === myAdsIdClass.isFacebook -- ${myAdsIdClass.isFacebook} === isFacebookAdsShow -- $isFacebookAdsShow === myAdsIdClass.isGoogle -- ${myAdsIdClass.isGoogle} === isADXAdsShow -- $isADXAdsShow');
             if (isCheckScreen) {
               provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
             } else {
@@ -161,9 +163,7 @@ class _ClarificationScreenState extends State<ClarificationScreen> {
   @override
   void dispose() {
     super.dispose();
-    if (receiver != null) {
-      receiver.cancel();
-    }
+    receiver.cancel();
 
     if (adxNativeAd != null) {
       adxNativeAd!.dispose();
@@ -182,7 +182,7 @@ class _ClarificationScreenState extends State<ClarificationScreen> {
       setState(() {
         adxNativeAd = NativeAd(
           adUnitId: nativeAdId,
-          factoryId: 'adFactory',
+          factoryId: 'listTileMedium',
           request: const AdRequest(),
           listener: NativeAdListener(
             onAdLoaded: (ad) {
@@ -272,12 +272,13 @@ class _ClarificationScreenState extends State<ClarificationScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+          const SizedBox(height: 10),
             fbNativeAd,
             adxNativeAd == null || _isAdxNativeAdLoaded == false
                 ? const SizedBox()
                 : Container(
                     color: Colors.transparent,
-                    height: 370,
+                    height: 275,
                     alignment: Alignment.center,
                     child: AdWidget(ad: adxNativeAd!),
                   ),
@@ -335,9 +336,7 @@ class _ClarificationScreenState extends State<ClarificationScreen> {
             const SizedBox(height: 30),
             CenterTextButtonWidget(
               onTap: () {
-                if (receiver != null) {
-                  receiver.cancel();
-                }
+                receiver.cancel();
                 final provider = Provider.of<InterstitialAdsWidgetProvider>(context, listen: false);
                 provider.showFbOrAdxOrAdmobInterstitialAd(
                   myAdsIdClass: myAdsIdClass,

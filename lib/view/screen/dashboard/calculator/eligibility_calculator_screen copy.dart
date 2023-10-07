@@ -81,6 +81,7 @@ class _EligibilityCalculatorScreenState extends State<EligibilityCalculatorScree
         }
       }
       if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
+        print('screenName $screenName === isCheckScreen -- $isCheckScreen === myAdsIdClass.isFacebook -- ${myAdsIdClass.isFacebook} === isFacebookAdsShow -- $isFacebookAdsShow === myAdsIdClass.isGoogle -- ${myAdsIdClass.isGoogle} === isADXAdsShow -- $isADXAdsShow');
         if (isCheckScreen) {
           provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
         } else {
@@ -106,6 +107,7 @@ class _EligibilityCalculatorScreenState extends State<EligibilityCalculatorScree
           setState(() {});
 
           if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
+            print('screenName $screenName === isCheckScreen -- $isCheckScreen === myAdsIdClass.isFacebook -- ${myAdsIdClass.isFacebook} === isFacebookAdsShow -- $isFacebookAdsShow === myAdsIdClass.isGoogle -- ${myAdsIdClass.isGoogle} === isADXAdsShow -- $isADXAdsShow');
             if (isCheckScreen) {
               provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
             } else {
@@ -212,9 +214,7 @@ class _EligibilityCalculatorScreenState extends State<EligibilityCalculatorScree
   @override
   void dispose() {
     super.dispose();
-    if (receiver != null) {
-      receiver.cancel();
-    }
+    receiver.cancel();
 
     if (nativeAd != null) {
       nativeAd!.dispose();
@@ -230,7 +230,7 @@ class _EligibilityCalculatorScreenState extends State<EligibilityCalculatorScree
       setState(() {
         nativeAd = NativeAd(
           adUnitId: nativeAdId,
-          factoryId: 'adFactory',
+          factoryId: 'listTileMedium',
           request: const AdRequest(),
           listener: NativeAdListener(
             onAdLoaded: (ad) {
@@ -265,12 +265,13 @@ class _EligibilityCalculatorScreenState extends State<EligibilityCalculatorScree
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                  const SizedBox(height: 10),
                     fbNativeAd,
                     nativeAd == null || _nativeAdIsLoaded == false
                         ? const SizedBox()
                         : Container(
                             color: Colors.transparent,
-                            height: 330,
+                            height: 275,
                             alignment: Alignment.center,
                             child: AdWidget(ad: nativeAd!),
                           ),

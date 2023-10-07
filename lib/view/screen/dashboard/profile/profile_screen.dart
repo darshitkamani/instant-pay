@@ -80,6 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }
       }
       if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
+        print('screenName $screenName === isCheckScreen -- $isCheckScreen === myAdsIdClass.isFacebook -- ${myAdsIdClass.isFacebook} === isFacebookAdsShow -- $isFacebookAdsShow === myAdsIdClass.isGoogle -- ${myAdsIdClass.isGoogle} === isADXAdsShow -- $isADXAdsShow');
         if (isCheckScreen) {
           provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
         } else {
@@ -191,6 +192,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           setState(() {});
 
           if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
+            print('screenName $screenName === isCheckScreen -- $isCheckScreen === myAdsIdClass.isFacebook -- ${myAdsIdClass.isFacebook} === isFacebookAdsShow -- $isFacebookAdsShow === myAdsIdClass.isGoogle -- ${myAdsIdClass.isGoogle} === isADXAdsShow -- $isADXAdsShow');
             if (isCheckScreen) {
               provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
             } else {
@@ -211,9 +213,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void dispose() {
-    if (receiver != null) {
-      receiver.cancel();
-    }
+    receiver.cancel();
 
     super.dispose();
     if (adxNativeAd != null) {
@@ -233,7 +233,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         adxNativeAd = NativeAd(
           adUnitId: nativeAdId,
-          factoryId: 'adFactory',
+          factoryId: 'listTileMedium',
           request: const AdRequest(),
           listener: NativeAdListener(
             onAdLoaded: (ad) {
@@ -285,7 +285,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 10),
                   ProfileButtonWidget(
                     onTap: () {
-                      final url = Uri.parse("market://details?id=com.loan.fundmentor_aa_credit_aa_kredit_loan_guide_instant_loan_smartcoin_personal_app_navi_loan_guide_app_instant_personal_loan_advisor_quick_loan");
+                      final url = Uri.parse("market://details?id=com.instant_pay_quick_loan_advisor");
                       launchUrl(url);
                     },
                     titleWidget: Icon(
@@ -298,7 +298,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ProfileButtonWidget(
                     onTap: () async {
                       if (Platform.isAndroid) {
-                        await LaunchReview.launch(androidAppId: 'com.loan.fundmentor_aa_credit_aa_kredit_loan_guide_instant_loan_smartcoin_personal_app_navi_loan_guide_app_instant_personal_loan_advisor_quick_loan', writeReview: true);
+                        await LaunchReview.launch(androidAppId: 'com.instant_pay_quick_loan_advisor', writeReview: true);
                       } else if (Platform.isIOS) {}
                     },
                     titleWidget: Icon(
@@ -310,7 +310,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 10),
                   ProfileButtonWidget(
                     onTap: () {
-                      Share.share('Check out this loan APP :\nhttps://play.google.com/store/apps/details?id=com.loan.fundmentor_aa_credit_aa_kredit_loan_guide_instant_loan_smartcoin_personal_app_navi_loan_guide_app_instant_personal_loan_advisor_quick_loan');
+                      Share.share('Check out this loan APP :\nhttps://play.google.com/store/apps/details?id=com.instant_pay_quick_loan_advisor');
                     },
                     titleWidget: Icon(
                       Icons.share_outlined,
@@ -395,7 +395,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ? const SizedBox()
                       : Container(
                           color: Colors.transparent,
-                          height: 330,
+                          height: 275,
                           alignment: Alignment.center,
                           child: AdWidget(ad: adxNativeAd!),
                         ),

@@ -75,6 +75,7 @@ class _FDCalculatorState extends State<FDCalculator> {
         }
       }
       if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
+        print('screenName $screenName === isCheckScreen -- $isCheckScreen === myAdsIdClass.isFacebook -- ${myAdsIdClass.isFacebook} === isFacebookAdsShow -- $isFacebookAdsShow === myAdsIdClass.isGoogle -- ${myAdsIdClass.isGoogle} === isADXAdsShow -- $isADXAdsShow');
         if (isCheckScreen) {
           provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
         } else {
@@ -100,6 +101,7 @@ class _FDCalculatorState extends State<FDCalculator> {
           setState(() {});
 
           if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
+            print('screenName $screenName === isCheckScreen -- $isCheckScreen === myAdsIdClass.isFacebook -- ${myAdsIdClass.isFacebook} === isFacebookAdsShow -- $isFacebookAdsShow === myAdsIdClass.isGoogle -- ${myAdsIdClass.isGoogle} === isADXAdsShow -- $isADXAdsShow');
             if (isCheckScreen) {
               provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
             } else {
@@ -222,7 +224,7 @@ class _FDCalculatorState extends State<FDCalculator> {
       setState(() {
         nativeAd = NativeAd(
           adUnitId: nativeAdId,
-          factoryId: 'adFactory',
+          factoryId: 'listTileMedium',
           request: const AdRequest(),
           listener: NativeAdListener(
             onAdLoaded: (ad) {
@@ -252,12 +254,13 @@ class _FDCalculatorState extends State<FDCalculator> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+          const SizedBox(height: 10),
             fbNativeAd,
             nativeAd == null || _nativeAdIsLoaded == false
                 ? const SizedBox()
                 : Container(
                     color: Colors.transparent,
-                    height: 330,
+                    height: 275,
                     alignment: Alignment.center,
                     child: AdWidget(ad: nativeAd!),
                   ),

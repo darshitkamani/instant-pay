@@ -74,6 +74,7 @@ class _LoanShortDescriptionScreenState extends State<LoanShortDescriptionScreen>
         }
       }
       if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
+        print('screenName $screenName === isCheckScreen -- $isCheckScreen === myAdsIdClass.isFacebook -- ${myAdsIdClass.isFacebook} === isFacebookAdsShow -- $isFacebookAdsShow === myAdsIdClass.isGoogle -- ${myAdsIdClass.isGoogle} === isADXAdsShow -- $isADXAdsShow');
         if (isCheckScreen) {
           provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
         } else {
@@ -99,6 +100,7 @@ class _LoanShortDescriptionScreenState extends State<LoanShortDescriptionScreen>
           setState(() {});
 
           if (myAdsIdClass.availableAdsList.contains("Interstitial")) {
+            print('screenName $screenName === isCheckScreen -- $isCheckScreen === myAdsIdClass.isFacebook -- ${myAdsIdClass.isFacebook} === isFacebookAdsShow -- $isFacebookAdsShow === myAdsIdClass.isGoogle -- ${myAdsIdClass.isGoogle} === isADXAdsShow -- $isADXAdsShow');
             if (isCheckScreen) {
               provider.loadFBInterstitialAd(myAdsIdClass: myAdsIdClass, screenName: screenName, fbID: myAdsIdClass.facebookInterstitialId, googleID: myAdsIdClass.googleInterstitialId);
             } else {
@@ -165,9 +167,7 @@ class _LoanShortDescriptionScreenState extends State<LoanShortDescriptionScreen>
   @override
   void dispose() {
     super.dispose();
-    if (receiver != null) {
-      receiver.cancel();
-    }
+    receiver.cancel();
 
     if (adxNativeAd != null) {
       adxNativeAd!.dispose();
@@ -192,7 +192,7 @@ class _LoanShortDescriptionScreenState extends State<LoanShortDescriptionScreen>
       setState(() {
         adxNativeAd = NativeAd(
           adUnitId: nativeAdId,
-          factoryId: 'adFactory',
+          factoryId: 'listTileMedium',
           request: const AdRequest(),
           listener: NativeAdListener(
             onAdLoaded: (ad) {
@@ -220,7 +220,7 @@ class _LoanShortDescriptionScreenState extends State<LoanShortDescriptionScreen>
       setState(() {
         adxNativeAd1 = NativeAd(
           adUnitId: nativeAdId,
-          factoryId: 'adFactory',
+          factoryId: 'listTileMedium',
           request: const AdRequest(),
           listener: NativeAdListener(
             onAdLoaded: (ad) {
@@ -323,12 +323,13 @@ class _LoanShortDescriptionScreenState extends State<LoanShortDescriptionScreen>
                     ),
                   ),
                   const Divider(thickness: 2),
+                  const SizedBox(height: 10),
                   fbNativeAd1,
                   adxNativeAd1 == null || _isAdxNativeAdLoaded1 == false
                       ? const SizedBox()
                       : Container(
                           color: Colors.transparent,
-                          height: 370,
+                          height: 275,
                           alignment: Alignment.center,
                           child: AdWidget(ad: adxNativeAd1!),
                         ),
@@ -419,12 +420,13 @@ class _LoanShortDescriptionScreenState extends State<LoanShortDescriptionScreen>
                       ),
                     ),
                   ),
+                  const SizedBox(height: 10),
                   fbNativeAd,
                   adxNativeAd == null || _isAdxNativeAdLoaded == false
                       ? const SizedBox()
                       : Container(
                           color: Colors.transparent,
-                          height: 370,
+                          height: 275,
                           alignment: Alignment.center,
                           child: AdWidget(ad: adxNativeAd!),
                         ),
@@ -523,9 +525,7 @@ class _LoanShortDescriptionScreenState extends State<LoanShortDescriptionScreen>
                       title: LocaleKeys.ContinueApplication.tr(),
                       onTap: () {
                         final provider = Provider.of<InterstitialAdsWidgetProvider>(context, listen: false);
-                        if (receiver != null) {
-                          receiver.cancel();
-                        }
+                        receiver.cancel();
 
                         return provider.showFbOrAdxOrAdmobInterstitialAd(
                           myAdsIdClass: myAdsIdClass,
